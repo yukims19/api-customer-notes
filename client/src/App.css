@@ -1,0 +1,49 @@
+@import '~antd/dist/antd.css';
+.App {
+  display: flex;
+}
+
+/* left-column*/
+.left-column,
+.right-column {
+  height: 100vh;
+  overflow: scroll;
+}
+.left-column {
+  flex: 0 0 250px;
+  background-color: #f7f7f7;
+}
+
+.left-filter .card-header {
+  border-bottom: 0px;
+}
+.left-filter .ant-collapse {
+  border: none;
+}
+.left-filter .ant-collapse .ant-collapse-header,
+.left-filter .ant-collapse .ant-collapse-content {
+  border: none;
+}
+
+.left-filter li {
+  font-size: 1rem;
+}
+.left-body li {
+  display: flex;
+  justify-content: flex-start;
+  border-bottom: 1px solid #cfcfcf;
+  padding: 10px;
+}
+.left-body li p {
+  margin: 0px;
+  font-size: 1rem;
+  color: #7f7f7f;
+}
+.left-body li .alluser-name {
+  color: black;
+  font-size: 1.2rem;
+}
+.left-body li .alluser-name:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
