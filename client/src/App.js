@@ -1,7 +1,115 @@
 import React, { Component } from "react";
 import "./App.css";
-import { Collapse, Input, Button } from "antd";
+import idx from "idx";
+import {
+  Collapse,
+  Input,
+  Button,
+  Form,
+  Icon,
+  Alert,
+  message,
+  Popconfirm
+} from "antd";
 const Panel = Collapse.Panel;
+const FormItem = Form.Item;
+
+class AddForm extends React.Component {
+  handleSubmit = e => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        this.callAdd(values)
+          .then(res => {
+            this.props.getAllCustomers();
+            message.success("Successfully added new customer: " + values.name);
+          })
+          .catch(error => {
+            console.log(error);
+            message.error("Failed to add new customer");
+          });
+        this.props.form.setFieldsValue({
+          name: "",
+          company: ""
+        });
+      }
+    });
+  };
+
+  callAdd = async values => {
+    const response = await fetch("/add", {
+      method: "POST",
+      body: JSON.stringify(values),
+      headers: { "Content-Type": "application/json" }
+    }).then(res => res);
+
+    const body = await response.json();
+    if (response.status !== 200) throw Error(body.message);
+    return body;
+  };
+
+  render() {
+    const { getFieldDecorator } = this.props.form;
+    return (
+      <div>
+        {/*this.state.alert
+                    ? <div
+                    className="alert alert-success alert-dismissible fade show"
+                    role="alert"
+                    >
+                    Added Successfully!
+                    <button
+                    type="button"
+                    className="close"
+                    data-dismiss="alert"
+                    aria-label="Close"
+                    >
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    : ""*/}
+        <Form onSubmit={this.handleSubmit} className="login-form">
+          <FormItem>
+            {getFieldDecorator("name", {
+              rules: [{ required: true, message: "Please input Name!" }]
+            })(
+              <Input
+                prefix={
+                  <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
+                }
+                placeholder="Name"
+              />
+            )}
+          </FormItem>
+          <FormItem>
+            {getFieldDecorator("company", {
+              rules: [{ required: true, message: "Please input Company!" }]
+            })(
+              <Input
+                prefix={
+                  <Icon type="profile" style={{ color: "rgba(0,0,0,.25)" }} />
+                }
+                placeholder="Company"
+              />
+            )}
+          </FormItem>
+          <FormItem>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="login-form-button"
+              onClick={this.handleAdd}
+            >
+              Add
+            </Button>
+          </FormItem>
+        </Form>
+      </div>
+    );
+  }
+}
+
+const WrappedAddForm = Form.create()(AddForm);
 
 class Filter extends Component {
   render() {
@@ -13,6 +121,20 @@ class Filter extends Component {
               placeholder="Enter Customer Name"
               onChange={this.props.onChange}
             />
+          </Panel>
+        </Collapse>
+      </div>
+    );
+  }
+}
+
+class AddNewCustomer extends Component {
+  render() {
+    return (
+      <div className="left-filter">
+        <Collapse>
+          <Panel header={"Add New Customer"} key="1">
+            <WrappedAddForm getAllCustomers={this.props.getAllCustomers} />
           </Panel>
         </Collapse>
       </div>
@@ -41,28 +163,29 @@ class Customer extends Component {
       JSON.stringify(this.props.selectedCustomer) !==
       JSON.stringify(prevProps.selectedCustomer)
     ) {
-      console.log("not mathcing");
-      this.setState(
-        {
-          invoice: this.props.selectedCustomer.invoice
-            ? this.props.selectedCustomer.invoice
-            : "",
-          password: this.props.selectedCustomer.password
-            ? this.props.selectedCustomer.password
-            : "",
-          others: this.props.selectedCustomer.others
-            ? this.props.selectedCustomer.others
-            : ""
-        },
-        () => {
-          console.log(this.state.invoice);
-        }
-      );
+      this.setState({
+        invoice: idx(this.props, _ => _.selectedCustomer.invoice)
+          ? this.props.selectedCustomer.invoice
+          : "",
+        password: idx(this.props, _ => _.selectedCustomer.password)
+          ? this.props.selectedCustomer.password
+          : "",
+        others: idx(this.props, _ => _.selectedCustomer.others)
+          ? this.props.selectedCustomer.others
+          : ""
+      });
     }
   }
 
   handleSave(field, customerId) {
-    this.callSave(field, customerId).catch(err => console.log(err));
+    this.callSave(field, customerId)
+      .then(res => {
+        message.success("Successfully saved for" + field);
+      })
+      .catch(err => {
+        console.log(err);
+        message.error("Something went wrong!!");
+      });
   }
   callSave = async (field, customerId) => {
     let content = null;
@@ -98,7 +221,7 @@ class Customer extends Component {
         {this.props.selectedCustomer
           ? <div>
               {" "}<h1>{this.props.selectedCustomer.name}</h1>
-              <Collapse bordered={false} defaultActiveKey={["1"]}>
+              <Collapse bordered={false} defaultActiveKey={["1", "2", "3"]}>
                 <Panel header="Invoice" key="1">
                   <textarea
                     ref={textarea => (this.invoice = textarea)}
@@ -159,7 +282,32 @@ class AllCustomers extends Component {
   componentDidMount() {
     this.props.getAllCustomers();
   }
+  confirm(customerId) {
+    this.handleDelete(customerId);
+  }
+  handleDelete(customerId) {
+    this.callDelete(customerId)
+      .then(res => {
+        message.success("Successfully Deleted");
+        this.props.getAllCustomers();
+      })
+      .catch(err => {
+        console.log(err);
+        message.error("Something went wrong!!");
+      });
+  }
+  callDelete = async customerId => {
+    const response = await fetch("/delete", {
+      method: "POST",
+      body: JSON.stringify({ customerId: customerId }),
+      headers: { "Content-Type": "application/json" }
+    }).then(res => res);
 
+    const body = await response.json();
+    if (response.status !== 200) throw Error(body.message);
+    return body;
+  };
+  cancel(e) {}
   render() {
     return (
       <div className="left-body">
@@ -168,6 +316,9 @@ class AllCustomers extends Component {
               if (
                 this.props.filter == null ||
                 customer.name
+                  .toLowerCase()
+                  .includes(this.props.filter.toLowerCase()) ||
+                customer.company
                   .toLowerCase()
                   .includes(this.props.filter.toLowerCase())
               ) {
@@ -184,6 +335,15 @@ class AllCustomers extends Component {
                         @{customer.company}
                       </p>
                     </div>
+                    <Popconfirm
+                      title="Are you sure delete this customer?"
+                      onConfirm={() => this.confirm(customer.id)}
+                      onCancel={this.cancel}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <a href="#">Delete</a>
+                    </Popconfirm>
                   </li>
                 );
               }
@@ -244,6 +404,7 @@ class App extends Component {
     return (
       <div className="App">
         <div className="left-column">
+          <AddNewCustomer getAllCustomers={this.getAllCustomers.bind(this)} />
           <Filter onChange={this.onChange.bind(this)} />
           <AllCustomers
             handleCustomerSelection={this.handleCustomerSelection.bind(this)}
