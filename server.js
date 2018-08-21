@@ -1,4 +1,4 @@
-require("dotenv").load();
+//require("dotenv").load();
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
@@ -13,6 +13,8 @@ const client = new Client({ connectionString: connectionString });
 client.connect();
 const aesjs = require("aes-js");
 const aes_key = process.env.AES_KEY.split(", ").map(Number);
+
+app.use(express.static(path.resolve(__dirname, "./client/build")));
 
 app.get("/customers", (req, res) => {
   var sql = "SELECT * FROM customers";
@@ -118,6 +120,10 @@ app.post("/delete", (req, res) => {
     }
     res.send({ respoonse: "success!!" });
   });
+});
+
+app.get("*", function(request, response) {
+  response.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
