@@ -4,26 +4,26 @@
   "description": "",
   "main": "server.js",
   "scripts": {
+    "start": "node server.js",
+    "heroku-postbuild": "cd client/ && npm install && npm install --only=dev --no-shrinkwrap && npm run build",
     "client": "cd client && yarn start",
     "server": "nodemon server.js",
     "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
+  "cacheDirectories": ["node_modules", "client/node_modules"],
+  "author": "Youxi Li",
   "dependencies": {
     "aes-js": "^3.1.1",
     "express": "^4.16.2",
     "idx": "^2.4.0",
-    "kue": "^0.11.6",
     "node-fetch": "2.2.0",
     "pg": "^7.4.3",
     "pg-escape": "^0.2.0",
-    "pg-promise": "^8.4.5",
-    "sqlite3": "^4.0.2"
+    "pg-promise": "^8.4.5"
   },
   "devDependencies": {
     "concurrently": "^3.5.0"
-  },
-  "author": "",
-  "license": "ISC"
+  }
 }
