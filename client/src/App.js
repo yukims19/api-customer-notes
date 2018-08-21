@@ -26,7 +26,7 @@ class AddForm extends React.Component {
           })
           .catch(error => {
             console.log(error);
-            message.error("Failed to add new customer");
+            message.error("Something went wrong!");
           });
         this.props.form.setFieldsValue({
           name: "",
