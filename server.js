@@ -41,7 +41,34 @@ app.post("/save/:field", (req, res) => {
     customerId.toString()
   );
   client.query(sql, (error, response) => {
-    console.log(error, response);
+    console.log(error);
+    res.send({ respoonse: "success!!" });
+  });
+});
+
+app.post("/add", (req, res) => {
+  const name = req.body.name;
+  const company = req.body.company;
+  const sql = escape(
+    "INSERT INTO customers(name, company) VALUES(%L, %L)",
+    name,
+    company
+  );
+  client.query(sql, (error, response) => {
+    console.log(error);
+    res.send({ respoonse: "success!!" });
+  });
+});
+
+app.post("/delete", (req, res) => {
+  const customerId = req.body.customerId;
+  const sql = escape(
+    "DELETE FROM customers WHERE id = %L",
+    customerId.toString()
+  );
+  client.query(sql, (error, response) => {
+    console.log(error);
+    res.send({ respoonse: "success!!" });
   });
 });
 
