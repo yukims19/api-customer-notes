@@ -52,22 +52,6 @@ class AddForm extends React.Component {
     const { getFieldDecorator } = this.props.form;
     return (
       <div>
-        {/*this.state.alert
-                    ? <div
-                    className="alert alert-success alert-dismissible fade show"
-                    role="alert"
-                    >
-                    Added Successfully!
-                    <button
-                    type="button"
-                    className="close"
-                    data-dismiss="alert"
-                    aria-label="Close"
-                    >
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                    </div>
-                    : ""*/}
         <Form onSubmit={this.handleSubmit} className="login-form">
           <FormItem>
             {getFieldDecorator("name", {
@@ -289,6 +273,7 @@ class AllCustomers extends Component {
     this.callDelete(customerId)
       .then(res => {
         message.success("Successfully Deleted");
+        //this.props.setSelectedCustomer();
         this.props.getAllCustomers();
       })
       .catch(err => {
@@ -323,12 +308,13 @@ class AllCustomers extends Component {
                   .includes(this.props.filter.toLowerCase())
               ) {
                 return (
-                  <li
-                    key={customer.id}
-                    onClick={() => this.props.handleCustomerSelection(customer)}
-                  >
+                  <li key={customer.id}>
                     <div className="alluser-userinfo">
-                      <p className="alluser-name">
+                      <p
+                        className="alluser-name"
+                        onClick={() =>
+                          this.props.handleCustomerSelection(customer)}
+                      >
                         {customer.name}
                       </p>
                       <p>
@@ -383,6 +369,11 @@ class App extends Component {
     this.setState({ filter: event.target.value });
   }
 
+  setSelectedCustomer() {
+    this.setState({
+      selectedCustomer: null
+    });
+  }
   handleCustomerSelection(customer) {
     this.callSelectedCustomers(customer.id)
       .then(res => {
@@ -411,6 +402,7 @@ class App extends Component {
             filter={this.state.filter}
             getAllCustomers={this.getAllCustomers.bind(this)}
             customersAll={this.state.customersAll}
+            setSelectedCustomer={this.setSelectedCustomer.bind(this)}
           />
         </div>
 
