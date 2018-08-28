@@ -279,6 +279,11 @@ class AllCustomers extends Component {
       .catch(err => {
         console.log(err);
         message.error("Something went wrong!!");
+      })
+      .then(() => {
+        if (customerId == this.props.selectedCustomer.id) {
+          this.props.setSelectedCustomer();
+        }
       });
   }
   callDelete = async customerId => {
@@ -407,6 +412,7 @@ class App extends Component {
             getAllCustomers={this.getAllCustomers.bind(this)}
             customersAll={this.state.customersAll}
             setSelectedCustomer={this.setSelectedCustomer.bind(this)}
+            selectedCustomer={this.state.selectedCustomer}
           />
         </div>
 
