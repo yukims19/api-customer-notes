@@ -34,6 +34,9 @@
   border-bottom: 1px solid #cfcfcf;
   padding: 10px;
 }
+.left-body li.active {
+  background-color: #efefef;
+}
 .left-body li p {
   margin: 0px;
   font-size: 1rem;

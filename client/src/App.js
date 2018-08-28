@@ -312,8 +312,8 @@ class AllCustomers extends Component {
                     <div className="alluser-userinfo">
                       <p
                         className="alluser-name"
-                        onClick={() =>
-                          this.props.handleCustomerSelection(customer)}
+                        onClick={e =>
+                          this.props.handleCustomerSelection(e, customer)}
                       >
                         {customer.name}
                       </p>
@@ -374,7 +374,11 @@ class App extends Component {
       selectedCustomer: null
     });
   }
-  handleCustomerSelection(customer) {
+  handleCustomerSelection(e, customer) {
+    const card = e.target.parentNode.parentNode;
+    const allCards = card.parentNode.childNodes;
+    allCards.forEach(e => e.classList.remove("active"));
+    card.classList.add("active");
     this.callSelectedCustomers(customer.id)
       .then(res => {
         this.setState({
