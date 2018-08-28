@@ -31,40 +31,55 @@ app.get("/customers/:id", (req, res) => {
   let resData;
   client.query(sql, (error, response) => {
     const data = response.rows[0];
-    let aesCtr = new aesjs.ModeOfOperation.ctr(aes_key, new aesjs.Counter());
-    const encryptedHexInvoice = data.invoice;
-    const encryptedBytesInvoice = aesjs.utils.hex.toBytes(encryptedHexInvoice);
-    const decryptedBytesInvoice = aesCtr.decrypt(encryptedBytesInvoice);
-    const decryptedTextInvoice = aesjs.utils.utf8.fromBytes(
-      decryptedBytesInvoice
-    );
-    aesCtr = new aesjs.ModeOfOperation.ctr(aes_key, new aesjs.Counter());
-    const encryptedHexPassword = data.password;
-    const encryptedBytesPassword = aesjs.utils.hex.toBytes(
-      encryptedHexPassword
-    );
-    const decryptedBytesPassword = aesCtr.decrypt(encryptedBytesPassword);
-    const decryptedTextPassword = aesjs.utils.utf8.fromBytes(
-      decryptedBytesPassword
-    );
-    aesCtr = new aesjs.ModeOfOperation.ctr(aes_key, new aesjs.Counter());
-    const encryptedHexOthers = data.others;
-    const encryptedBytesOthers = aesjs.utils.hex.toBytes(encryptedHexOthers);
-    const decryptedBytesOthers = aesCtr.decrypt(encryptedBytesOthers);
-    const decryptedTextOthers = aesjs.utils.utf8.fromBytes(
-      decryptedBytesOthers
-    );
+    if (data) {
+      let aesCtr = new aesjs.ModeOfOperation.ctr(aes_key, new aesjs.Counter());
+      const encryptedHexInvoice = data.invoice;
+      const encryptedBytesInvoice = aesjs.utils.hex.toBytes(
+        encryptedHexInvoice
+      );
+      const decryptedBytesInvoice = aesCtr.decrypt(encryptedBytesInvoice);
+      const decryptedTextInvoice = aesjs.utils.utf8.fromBytes(
+        decryptedBytesInvoice
+      );
+      aesCtr = new aesjs.ModeOfOperation.ctr(aes_key, new aesjs.Counter());
+      const encryptedHexPassword = data.password;
+      const encryptedBytesPassword = aesjs.utils.hex.toBytes(
+        encryptedHexPassword
+      );
+      const decryptedBytesPassword = aesCtr.decrypt(encryptedBytesPassword);
+      const decryptedTextPassword = aesjs.utils.utf8.fromBytes(
+        decryptedBytesPassword
+      );
+      aesCtr = new aesjs.ModeOfOperation.ctr(aes_key, new aesjs.Counter());
+      const encryptedHexOthers = data.others;
+      const encryptedBytesOthers = aesjs.utils.hex.toBytes(encryptedHexOthers);
+      const decryptedBytesOthers = aesCtr.decrypt(encryptedBytesOthers);
+      const decryptedTextOthers = aesjs.utils.utf8.fromBytes(
+        decryptedBytesOthers
+      );
 
-    resData = [
-      {
-        id: data.id,
-        name: data.name,
-        company: data.company,
-        invoice: decryptedTextInvoice,
-        password: decryptedTextPassword,
-        others: decryptedTextOthers
-      }
-    ];
+      resData = [
+        {
+          id: data.id,
+          name: data.name,
+          company: data.company,
+          invoice: decryptedTextInvoice,
+          password: decryptedTextPassword,
+          others: decryptedTextOthers
+        }
+      ];
+    } else {
+      resData = [
+        {
+          id: null,
+          name: null,
+          company: null,
+          invoice: null,
+          password: null,
+          others: null
+        }
+      ];
+    }
     res.send(resData);
   });
 });
