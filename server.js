@@ -31,16 +31,11 @@ app.use(
 );
 
 app.get("/checkLogin", (req, res) => {
-  console.log("/checkLogin");
-  console.log(req.session.isLoggedin);
   const sessionId = req.session.id;
   res.send({ isLoggedin: req.session.isLoggedin });
 });
 
 app.post("/login", (req, res) => {
-  console.log("/login");
-  console.log(req.session.id);
-  console.log(req.session);
   const username = req.body.username;
   const usernameBytes = aesjs.utils.utf8.toBytes(username);
   const aesCtr = new aesjs.ModeOfOperation.ctr(aes_key, new aesjs.Counter());

@@ -22,7 +22,6 @@ class NormalLoginForm extends React.Component {
       if (!err) {
         this.callLogin(values)
           .then(res => {
-            console.log(res);
             this.props.setLogin(res.isLoggedin);
           })
           .catch(err => {
@@ -433,7 +432,6 @@ class App extends Component {
   componentDidMount() {
     this.callCheckLogin()
       .then(res => {
-        console.log(res);
         this.setState({ isLoggedin: res.isLoggedin });
       })
       .catch(error => console.log(error));
