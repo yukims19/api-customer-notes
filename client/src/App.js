@@ -11,8 +11,82 @@ import {
   message,
   Popconfirm
 } from "antd";
+
 const Panel = Collapse.Panel;
 const FormItem = Form.Item;
+
+class NormalLoginForm extends React.Component {
+  handleSubmit = e => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        this.callLogin(values)
+          .then(res => {
+            this.props.setLogin(res.isLoggedin);
+          })
+          .catch(err => {
+            console.log(err);
+            message.error("Invalid Login! Try again");
+          });
+      }
+    });
+  };
+
+  callLogin = async values => {
+    const response = await fetch("/login", {
+      method: "POST",
+      body: JSON.stringify({
+        username: values.username,
+        password: values.password
+      }),
+      headers: { "Content-Type": "application/json" }
+    });
+
+    const body = await response.json();
+    if (response.status !== 200) throw Error(body.message);
+    return body;
+  };
+
+  render() {
+    const { getFieldDecorator } = this.props.form;
+    return (
+      <Form onSubmit={this.handleSubmit} className="login-form">
+        <FormItem>
+          {getFieldDecorator("userName", {
+            rules: [{ required: true, message: "Please input your username!" }]
+          })(
+            <Input
+              prefix={<Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />}
+              placeholder="Username"
+            />
+          )}
+        </FormItem>
+        <FormItem>
+          {getFieldDecorator("password", {
+            rules: [{ required: true, message: "Please input your Password!" }]
+          })(
+            <Input
+              prefix={<Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />}
+              type="password"
+              placeholder="Password"
+            />
+          )}
+        </FormItem>
+        <FormItem>
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="login-form-button"
+          >
+            Log in
+          </Button>
+        </FormItem>
+      </Form>
+    );
+  }
+}
+
+const LoginForm = Form.create()(NormalLoginForm);
 
 class AddForm extends React.Component {
   handleSubmit = e => {
@@ -351,9 +425,25 @@ class App extends Component {
     this.state = {
       filter: null,
       selectedCustomer: null,
-      customersAll: []
+      customersAll: [],
+      isLoggedin: null
     };
   }
+  componentDidMount() {
+    this.callCheckLogin()
+      .then(res => {
+        this.setState({ isLoggedin: res.isLoggedin });
+      })
+      .catch(error => console.log(error));
+  }
+
+  callCheckLogin = async () => {
+    const response = await fetch("/checkLogin");
+    const body = await response.json();
+    if (response.status !== 200) throw Error(body.message);
+    return body;
+  };
+
   getAllCustomers() {
     this.callCustomers()
       .then(res =>
@@ -400,25 +490,42 @@ class App extends Component {
     return body;
   };
 
+  setLogin(isLoggedin) {
+    this.setState({ isLoggedin: isLoggedin });
+  }
+
   render() {
     return (
-      <div className="App">
-        <div className="left-column">
-          <AddNewCustomer getAllCustomers={this.getAllCustomers.bind(this)} />
-          <Filter onChange={this.onChange.bind(this)} />
-          <AllCustomers
-            handleCustomerSelection={this.handleCustomerSelection.bind(this)}
-            filter={this.state.filter}
-            getAllCustomers={this.getAllCustomers.bind(this)}
-            customersAll={this.state.customersAll}
-            setSelectedCustomer={this.setSelectedCustomer.bind(this)}
-            selectedCustomer={this.state.selectedCustomer}
-          />
-        </div>
+      <div>
+        {this.state.isLoggedin
+          ? <div className="App">
+              <div className="left-column">
+                <AddNewCustomer
+                  getAllCustomers={this.getAllCustomers.bind(this)}
+                />
+                <Filter onChange={this.onChange.bind(this)} />
+                <AllCustomers
+                  handleCustomerSelection={this.handleCustomerSelection.bind(
+                    this
+                  )}
+                  filter={this.state.filter}
+                  getAllCustomers={this.getAllCustomers.bind(this)}
+                  customersAll={this.state.customersAll}
+                  setSelectedCustomer={this.setSelectedCustomer.bind(this)}
+                  selectedCustomer={this.state.selectedCustomer}
+                />
+              </div>
 
-        <div className="right-column">
-          <Customer selectedCustomer={this.state.selectedCustomer} />
-        </div>
+              <div className="right-column">
+                <Customer selectedCustomer={this.state.selectedCustomer} />
+              </div>
+            </div>
+          : <div className="login">
+              <h1>API Customer notes</h1>
+              <div className="login-form-div">
+                <LoginForm setLogin={this.setLogin.bind(this)} />
+              </div>
+            </div>}
       </div>
     );
   }
