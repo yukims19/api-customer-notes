@@ -10,16 +10,21 @@
     "server": "nodemon server.js",
     "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
   },
-  "cacheDirectories": ["node_modules", "client/node_modules"],
+  "cacheDirectories": [
+    "node_modules",
+    "client/node_modules"
+  ],
   "author": "Youxi Li",
   "dependencies": {
     "aes-js": "^3.1.1",
     "express": "^4.16.2",
+    "express-session": "^1.15.6",
     "idx": "^2.4.0",
     "node-fetch": "2.2.0",
     "pg": "^7.4.3",
     "pg-escape": "^0.2.0",
-    "pg-promise": "^8.4.5"
+    "pg-promise": "^8.4.5",
+    "universal-cookie": "^3.0.4"
   },
   "devDependencies": {
     "concurrently": "^3.5.0"
