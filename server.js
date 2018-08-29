@@ -14,14 +14,15 @@ const client = new Client({ connectionString: connectionString });
 client.connect();
 const aesjs = require("aes-js");
 const aes_key = process.env.AES_KEY.split(", ").map(Number);
-var session = require("express-session");
+const session = require("express-session");
 
 app.use(express.static(path.resolve(__dirname, "./client/build")));
 
 app.set("trust proxy", 1); // trust first proxy
 app.use(
   session({
-    secret: "keyboard cat",
+    store: new (require("connect-pg-simple")(session))(),
+    secret: process.env.COOKIE_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: { path: "/", httpOnly: true, secure: false, maxAge: null },
