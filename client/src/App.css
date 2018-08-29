@@ -2,6 +2,16 @@
 .App {
   display: flex;
 }
+/*Login*/
+.login h1 {
+  text-align: center;
+}
+.login-form-div {
+  width: 50%;
+  max-width: 300px;
+  text-align: center;
+  margin: 100px auto;
+}
 
 /* left-column*/
 .left-column,
