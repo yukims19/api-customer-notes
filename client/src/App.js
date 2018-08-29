@@ -426,9 +426,26 @@ class App extends Component {
     this.state = {
       filter: null,
       selectedCustomer: null,
-      customersAll: []
+      customersAll: [],
+      isLoggedin: null
     };
   }
+  componentDidMount() {
+    this.callCheckLogin()
+      .then(res => {
+        console.log(res);
+        this.setState({ isLoggedin: res.isLoggedin });
+      })
+      .catch(error => console.log(error));
+  }
+
+  callCheckLogin = async () => {
+    const response = await fetch("/checkLogin");
+    const body = await response.json();
+    if (response.status !== 200) throw Error(body.message);
+    return body;
+  };
+
   getAllCustomers() {
     this.callCustomers()
       .then(res =>
