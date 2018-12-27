@@ -12,6 +12,8 @@ import {
   Popconfirm
 } from "antd";
 
+import Json2csvParser from 'json2csv';
+
 const Panel = Collapse.Panel;
 const FormItem = Form.Item;
 
@@ -498,7 +500,9 @@ class App extends Component {
         e.preventDefault();
         this.callDownload()
             .then(res => {
-                const parser = new Parser(opts);
+                const fields = ['id', 'name', 'company', 'invoice', 'password', 'others'];
+                const opts = { fields };
+                const parser = Json2csvParser.Parser(opts);
                 const csv = parser.parse(res.data);
                 const hiddenElement = document.createElement('a');
                 hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
