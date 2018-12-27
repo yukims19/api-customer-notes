@@ -50,9 +50,9 @@ app.post("/login", (req, res) => {
   const encryptedHexPassword = aesjs.utils.hex.fromBytes(
     encryptedBytesPassword
   );
-  /*
+
   console.log(encryptedHexUsername, encryptedHexPassword);
-  Insert into users(username,password) Values(encryptedHexUsername, encryptedHexPassword);*/
+//  Insert into users(username,password) Values(encryptedHexUsername, encryptedHexPassword)
   const sql = escape(
     "select *  FROM users WHERE username = %L AND password = %L",
     encryptedHexUsername,
@@ -60,6 +60,7 @@ app.post("/login", (req, res) => {
   );
   client.query(sql, (error, response) => {
     console.log(error);
+    console.log(response);
     if (error) {
       req.session.isLoggedin = false;
       throw new Error("Invalid Login!");
