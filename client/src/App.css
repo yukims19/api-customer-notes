@@ -14,6 +14,10 @@
 }
 
 /* left-column*/
+.download{
+    text-align: center;
+    padding: 1rem 0px;
+}
 .left-column,
 .right-column {
   height: 100vh;

@@ -219,6 +219,24 @@ app.post("/delete", (req, res) => {
   }
 });
 
+app.get("/download", (req, res) => {
+    if (req.session.isLoggedin) {
+        var sql = "SELECT * FROM customers";
+        let resData;
+        client.query(sql, (error, response) => {
+            resData = response.rows;
+            try {
+                res.send({data: resData});
+            } catch (err) {
+                console.error(err);
+            }
+            //res.send(resData);
+        });
+    } else {
+        res.send({ err: "Please login!" });
+    }
+});
+
 app.get("*", function(request, response) {
   response.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
 });
