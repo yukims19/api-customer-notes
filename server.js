@@ -36,9 +36,10 @@ app.get("/checkLogin", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
+  const aesCtr = new aesjs.ModeOfOperation.ctr(aes_key, new aesjs.Counter());
+
   const username = req.body.username;
   const usernameBytes = aesjs.utils.utf8.toBytes(username);
-  const aesCtr = new aesjs.ModeOfOperation.ctr(aes_key, new aesjs.Counter());
   const encryptedBytesUsername = aesCtr.encrypt(usernameBytes);
   const encryptedHexUsername = aesjs.utils.hex.fromBytes(
     encryptedBytesUsername
@@ -51,6 +52,7 @@ app.post("/login", (req, res) => {
     encryptedBytesPassword
   );
 
+  console.log(username, password);
   console.log(encryptedHexUsername, encryptedHexPassword);
 //  Insert into users(username,password) Values(encryptedHexUsername, encryptedHexPassword)
   const sql = escape(
