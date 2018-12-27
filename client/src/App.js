@@ -12,7 +12,9 @@ import {
   Popconfirm
 } from "antd";
 
-import Json2csvParser from 'json2csv';
+import{Parser} from 'json2csv';
+const fields = ['id', 'name', 'company', 'invoice', 'password', 'others'];
+const opts = { fields };
 
 const Panel = Collapse.Panel;
 const FormItem = Form.Item;
@@ -496,13 +498,11 @@ class App extends Component {
     this.setState({ isLoggedin: isLoggedin });
   }
 
-  downloadButtonOnClick = e => {
+    downloadButtonOnClick = e => {
         e.preventDefault();
         this.callDownload()
             .then(res => {
-                const fields = ['id', 'name', 'company', 'invoice', 'password', 'others'];
-                const opts = { fields };
-                const parser = Json2csvParser.Parser(opts);
+                const parser = new Parser(opts);
                 const csv = parser.parse(res.data);
                 const hiddenElement = document.createElement('a');
                 hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
@@ -516,7 +516,7 @@ class App extends Component {
             });
     };
 
-  callDownload = async () => {
+    callDownload = async () => {
         const response = await fetch("/download");
         const body = await response.json();
         if (response.status !== 200) throw Error(response);
