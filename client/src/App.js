@@ -12,8 +12,8 @@ import {
   Popconfirm
 } from "antd";
 
-import{Parser} from 'json2csv';
-const fields = ['id', 'name', 'company', 'invoice', 'password', 'others'];
+import { Parser } from "json2csv";
+const fields = ["id", "name", "company", "invoice", "password", "others"];
 const opts = { fields };
 
 const Panel = Collapse.Panel;
@@ -239,8 +239,8 @@ class Customer extends Component {
     }
   }
 
-  handleSave(field, customerId) {
-    this.callSave(field, customerId)
+  handleSave(field, value) {
+    this.callSave(field, value)
       .then(res => {
         message.success("Successfully saved for" + field);
       })
@@ -396,13 +396,12 @@ class AllCustomers extends Component {
                       <p
                         className="alluser-name"
                         onClick={e =>
-                          this.props.handleCustomerSelection(e, customer)}
+                          this.props.handleCustomerSelection(e, customer)
+                        }
                       >
                         {customer.name}
                       </p>
-                      <p>
-                        @{customer.company}
-                      </p>
+                      <p>@{customer.company}</p>
                     </div>
                     <Popconfirm
                       title="Are you sure delete this customer?"
@@ -498,67 +497,75 @@ class App extends Component {
     this.setState({ isLoggedin: isLoggedin });
   }
 
-    downloadButtonOnClick = e => {
-        e.preventDefault();
-        this.callDownload()
-            .then(res => {
-                const parser = new Parser(opts);
-                const csv = parser.parse(res.data);
-                const hiddenElement = document.createElement('a');
-                hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
-                hiddenElement.target = '_blank';
-                hiddenElement.download = 'note-data.csv';
-                hiddenElement.click();
-            })
-            .catch(err => {
-                console.log(err);
-                message.error("Failed to download");
-            });
-    };
+  downloadButtonOnClick = e => {
+    e.preventDefault();
+    this.callDownload()
+      .then(res => {
+        const parser = new Parser(opts);
+        const csv = parser.parse(res.data);
+        const hiddenElement = document.createElement("a");
+        hiddenElement.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
+        hiddenElement.target = "_blank";
+        hiddenElement.download = "note-data.csv";
+        hiddenElement.click();
+      })
+      .catch(err => {
+        console.log(err);
+        message.error("Failed to download");
+      });
+  };
 
-    callDownload = async () => {
-        const response = await fetch("/download");
-        const body = await response.json();
-        if (response.status !== 200) throw Error(response);
-        return body;
-    };
+  callDownload = async () => {
+    const response = await fetch("/download");
+    const body = await response.json();
+    if (response.status !== 200) throw Error(response);
+    return body;
+  };
 
   render() {
     return (
-        <div>
-            {this.state.isLoggedin
-             ? <div className="App">
-                 <div className="left-column">
-                     <div className = "download">
-                         <button className="btn btn-secondary" onClick = {e => this.downloadButtonOnClick(e)}> Download All Data </button>
-                     </div>
-                     <AddNewCustomer
-                         getAllCustomers={this.getAllCustomers.bind(this)}
-                     />
-                     <Filter onChange={this.onChange.bind(this)} />
-                     <AllCustomers
-                         handleCustomerSelection={this.handleCustomerSelection.bind(
-                                 this
-                         )}
-                         filter={this.state.filter}
-                         getAllCustomers={this.getAllCustomers.bind(this)}
-                         customersAll={this.state.customersAll}
-                         setSelectedCustomer={this.setSelectedCustomer.bind(this)}
-                         selectedCustomer={this.state.selectedCustomer}
-                     />
-                 </div>
+      <div>
+        {this.state.isLoggedin ? (
+          <div className="App">
+            <div className="left-column">
+              <div className="download">
+                <button
+                  className="btn btn-secondary"
+                  onClick={e => this.downloadButtonOnClick(e)}
+                >
+                  {" "}
+                  Download All Data{" "}
+                </button>
+              </div>
+              <AddNewCustomer
+                getAllCustomers={this.getAllCustomers.bind(this)}
+              />
+              <Filter onChange={this.onChange.bind(this)} />
+              <AllCustomers
+                handleCustomerSelection={this.handleCustomerSelection.bind(
+                  this
+                )}
+                filter={this.state.filter}
+                getAllCustomers={this.getAllCustomers.bind(this)}
+                customersAll={this.state.customersAll}
+                setSelectedCustomer={this.setSelectedCustomer.bind(this)}
+                selectedCustomer={this.state.selectedCustomer}
+              />
+            </div>
 
-                 <div className="right-column">
-                     <Customer selectedCustomer={this.state.selectedCustomer} />
-                 </div>
-             </div>
-             : <div className="login">
-                 <h1>API Customer notes</h1>
-                 <div className="login-form-div">
-                     <LoginForm setLogin={this.setLogin.bind(this)} />
-                 </div>
-             </div>}
-        </div>
+            <div className="right-column">
+              <Customer selectedCustomer={this.state.selectedCustomer} />
+            </div>
+          </div>
+        ) : (
+          <div className="login">
+            <h1>API Customer notes</h1>
+            <div className="login-form-div">
+              <LoginForm setLogin={this.setLogin.bind(this)} />
+            </div>
+          </div>
+        )}
+      </div>
     );
   }
 }
