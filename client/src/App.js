@@ -515,7 +515,7 @@ class App extends Component {
                   onClick={e => this.downloadButtonOnClick(e)}
                 >
                   {" "}
-                  Download All Data{" "}
+                  Download Backup Data{" "}
                 </button>
               </div>
               <AddNewCustomer
