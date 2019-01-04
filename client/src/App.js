@@ -12,8 +12,8 @@ import {
   Popconfirm
 } from "antd";
 
-import{Parser} from 'json2csv';
-const fields = ['id', 'name', 'company', 'invoice', 'password', 'others'];
+import { Parser } from "json2csv";
+const fields = ["id", "name", "company", "invoice", "password", "others"];
 const opts = { fields };
 
 const Panel = Collapse.Panel;
@@ -239,27 +239,29 @@ class Customer extends Component {
     }
   }
 
-  handleSave(field, customerId) {
-    this.callSave(field, customerId)
+  handleSave(field, value) {
+    this.callSave(field, value)
       .then(res => {
-        message.success("Successfully saved for" + field);
+        //message.success("Successfully saved for" + field);
+        //console.log("Successfully saved for" + field);
       })
       .catch(err => {
         console.log(err);
         message.error("Something went wrong!!");
       });
   }
-  callSave = async (field, customerId) => {
+
+  callSave = async (field, value) => {
     let content = null;
     switch (field) {
       case "invoice":
-        content = { invoice: this.invoice.value, id: customerId };
+        content = { invoice: value, id: this.props.selectedCustomer.id };
         break;
       case "password":
-        content = { password: this.password.value, id: customerId };
+        content = { password: value, id: this.props.selectedCustomer.id };
         break;
       case "others":
-        content = { others: this.others.value, id: customerId };
+        content = { others: value, id: this.props.selectedCustomer.id };
         break;
       default:
         console.log("Wrong");
@@ -274,67 +276,46 @@ class Customer extends Component {
     if (response.status !== 200) throw Error(body.message);
     return body;
   };
+
   handleTextareaChange(event, field) {
     this.setState({ [field]: event.target.value });
+    this.handleSave(field, event.target.value);
   }
+
   render() {
     return (
       <div className="customer-main">
-        {this.props.selectedCustomer
-          ? <div>
-              {" "}<h1>{this.props.selectedCustomer.name}</h1>
-              <Collapse bordered={false} defaultActiveKey={["1", "2", "3"]}>
-                <Panel header="Invoice" key="1">
-                  <textarea
-                    ref={textarea => (this.invoice = textarea)}
-                    value={this.state.invoice}
-                    onChange={e => this.handleTextareaChange(e, "invoice")}
-                  />
-                  <Button
-                    type="primary"
-                    onClick={() =>
-                      this.handleSave(
-                        "invoice",
-                        this.props.selectedCustomer.id
-                      )}
-                  >
-                    Save
-                  </Button>
-                </Panel>
-                <Panel header="Password" key="2">
-                  <textarea
-                    ref={textarea => (this.password = textarea)}
-                    value={this.state.password}
-                    onChange={e => this.handleTextareaChange(e, "password")}
-                  />
-                  <Button
-                    type="primary"
-                    onClick={() =>
-                      this.handleSave(
-                        "password",
-                        this.props.selectedCustomer.id
-                      )}
-                  >
-                    Save
-                  </Button>
-                </Panel>
-                <Panel header="Others" key="3">
-                  <textarea
-                    ref={textarea => (this.others = textarea)}
-                    value={this.state.others}
-                    onChange={e => this.handleTextareaChange(e, "others")}
-                  />
-                  <Button
-                    type="primary"
-                    onClick={() =>
-                      this.handleSave("others", this.props.selectedCustomer.id)}
-                  >
-                    Save
-                  </Button>
-                </Panel>
-              </Collapse>
-            </div>
-          : ""}
+        {this.props.selectedCustomer ? (
+          <div>
+            {" "}
+            <h1>{this.props.selectedCustomer.name}</h1>
+            <Collapse bordered={false} defaultActiveKey={["1", "2", "3"]}>
+              <Panel header="Invoice" key="1">
+                <textarea
+                  ref={textarea => (this.invoice = textarea)}
+                  value={this.state.invoice}
+                  onChange={e => this.handleTextareaChange(e, "invoice")}
+                />
+              </Panel>
+              <Panel header="Password" key="2">
+                <textarea
+                  ref={textarea => (this.password = textarea)}
+                  value={this.state.password}
+                  onChange={e => this.handleTextareaChange(e, "password")}
+                />
+              </Panel>
+              <Panel header="Others" key="3">
+                <textarea
+                  ref={textarea => (this.others = textarea)}
+                  value={this.state.others}
+                  onChange={e => this.handleTextareaChange(e, "others")}
+                />
+              </Panel>
+            </Collapse>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
     );
   }
@@ -396,13 +377,12 @@ class AllCustomers extends Component {
                       <p
                         className="alluser-name"
                         onClick={e =>
-                          this.props.handleCustomerSelection(e, customer)}
+                          this.props.handleCustomerSelection(e, customer)
+                        }
                       >
                         {customer.name}
                       </p>
-                      <p>
-                        @{customer.company}
-                      </p>
+                      <p>@{customer.company}</p>
                     </div>
                     <Popconfirm
                       title="Are you sure delete this customer?"
@@ -498,67 +478,75 @@ class App extends Component {
     this.setState({ isLoggedin: isLoggedin });
   }
 
-    downloadButtonOnClick = e => {
-        e.preventDefault();
-        this.callDownload()
-            .then(res => {
-                const parser = new Parser(opts);
-                const csv = parser.parse(res.data);
-                const hiddenElement = document.createElement('a');
-                hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
-                hiddenElement.target = '_blank';
-                hiddenElement.download = 'note-data.csv';
-                hiddenElement.click();
-            })
-            .catch(err => {
-                console.log(err);
-                message.error("Failed to download");
-            });
-    };
+  downloadButtonOnClick = e => {
+    e.preventDefault();
+    this.callDownload()
+      .then(res => {
+        const parser = new Parser(opts);
+        const csv = parser.parse(res.data);
+        const hiddenElement = document.createElement("a");
+        hiddenElement.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
+        hiddenElement.target = "_blank";
+        hiddenElement.download = "note-data.csv";
+        hiddenElement.click();
+      })
+      .catch(err => {
+        console.log(err);
+        message.error("Failed to download");
+      });
+  };
 
-    callDownload = async () => {
-        const response = await fetch("/download");
-        const body = await response.json();
-        if (response.status !== 200) throw Error(response);
-        return body;
-    };
+  callDownload = async () => {
+    const response = await fetch("/download");
+    const body = await response.json();
+    if (response.status !== 200) throw Error(response);
+    return body;
+  };
 
   render() {
     return (
-        <div>
-            {this.state.isLoggedin
-             ? <div className="App">
-                 <div className="left-column">
-                     <div className = "download">
-                         <button className="btn btn-secondary" onClick = {e => this.downloadButtonOnClick(e)}> Download All Data </button>
-                     </div>
-                     <AddNewCustomer
-                         getAllCustomers={this.getAllCustomers.bind(this)}
-                     />
-                     <Filter onChange={this.onChange.bind(this)} />
-                     <AllCustomers
-                         handleCustomerSelection={this.handleCustomerSelection.bind(
-                                 this
-                         )}
-                         filter={this.state.filter}
-                         getAllCustomers={this.getAllCustomers.bind(this)}
-                         customersAll={this.state.customersAll}
-                         setSelectedCustomer={this.setSelectedCustomer.bind(this)}
-                         selectedCustomer={this.state.selectedCustomer}
-                     />
-                 </div>
+      <div>
+        {this.state.isLoggedin ? (
+          <div className="App">
+            <div className="left-column">
+              <div className="download">
+                <button
+                  className="btn btn-secondary"
+                  onClick={e => this.downloadButtonOnClick(e)}
+                >
+                  {" "}
+                  Download All Data{" "}
+                </button>
+              </div>
+              <AddNewCustomer
+                getAllCustomers={this.getAllCustomers.bind(this)}
+              />
+              <Filter onChange={this.onChange.bind(this)} />
+              <AllCustomers
+                handleCustomerSelection={this.handleCustomerSelection.bind(
+                  this
+                )}
+                filter={this.state.filter}
+                getAllCustomers={this.getAllCustomers.bind(this)}
+                customersAll={this.state.customersAll}
+                setSelectedCustomer={this.setSelectedCustomer.bind(this)}
+                selectedCustomer={this.state.selectedCustomer}
+              />
+            </div>
 
-                 <div className="right-column">
-                     <Customer selectedCustomer={this.state.selectedCustomer} />
-                 </div>
-             </div>
-             : <div className="login">
-                 <h1>API Customer notes</h1>
-                 <div className="login-form-div">
-                     <LoginForm setLogin={this.setLogin.bind(this)} />
-                 </div>
-             </div>}
-        </div>
+            <div className="right-column">
+              <Customer selectedCustomer={this.state.selectedCustomer} />
+            </div>
+          </div>
+        ) : (
+          <div className="login">
+            <h1>API Customer notes</h1>
+            <div className="login-form-div">
+              <LoginForm setLogin={this.setLogin.bind(this)} />
+            </div>
+          </div>
+        )}
+      </div>
     );
   }
 }

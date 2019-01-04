@@ -54,7 +54,7 @@ app.post("/login", (req, res) => {
 
   console.log(username, password);
   console.log(encryptedHexUsername, encryptedHexPassword);
-//  Insert into users(username,password) Values(encryptedHexUsername, encryptedHexPassword)
+  //  Insert into users(username,password) Values(encryptedHexUsername, encryptedHexPassword)
   const sql = escape(
     "select *  FROM users WHERE username = %L AND password = %L",
     encryptedHexUsername,
@@ -223,64 +223,64 @@ app.post("/delete", (req, res) => {
 });
 
 app.get("/download", (req, res) => {
-    if (req.session.isLoggedin) {
-        var sql = "SELECT * FROM customers";
+  if (req.session.isLoggedin) {
+    var sql = "SELECT * FROM customers";
 
-        client.query(sql, (error, response) => {
-            try {
-                let resDataRaw = response.rows;
-                let resData = resDataRaw.map(data => {
-                    let aesCtr = new aesjs.ModeOfOperation.ctr(
-                        aes_key,
-                        new aesjs.Counter()
-                    );
-                    const encryptedHexInvoice = data.invoice;
-                    const encryptedBytesInvoice = aesjs.utils.hex.toBytes(
-                        encryptedHexInvoice
-                    );
-                    const decryptedBytesInvoice = aesCtr.decrypt(encryptedBytesInvoice);
-                    const decryptedTextInvoice = aesjs.utils.utf8.fromBytes(
-                        decryptedBytesInvoice
-                    );
-                    aesCtr = new aesjs.ModeOfOperation.ctr(aes_key, new aesjs.Counter());
-                    const encryptedHexPassword = data.password;
-                    const encryptedBytesPassword = aesjs.utils.hex.toBytes(
-                        encryptedHexPassword
-                    );
-                    const decryptedBytesPassword = aesCtr.decrypt(encryptedBytesPassword);
-                    const decryptedTextPassword = aesjs.utils.utf8.fromBytes(
-                        decryptedBytesPassword
-                    );
-                    aesCtr = new aesjs.ModeOfOperation.ctr(aes_key, new aesjs.Counter());
-                    const encryptedHexOthers = data.others;
-                    const encryptedBytesOthers = aesjs.utils.hex.toBytes(
-                        encryptedHexOthers
-                    );
-                    const decryptedBytesOthers = aesCtr.decrypt(encryptedBytesOthers);
-                    const decryptedTextOthers = aesjs.utils.utf8.fromBytes(
-                        decryptedBytesOthers
-                    );
+    client.query(sql, (error, response) => {
+      try {
+        let resDataRaw = response.rows;
+        let resData = resDataRaw.map(data => {
+          let aesCtr = new aesjs.ModeOfOperation.ctr(
+            aes_key,
+            new aesjs.Counter()
+          );
+          const encryptedHexInvoice = data.invoice;
+          const encryptedBytesInvoice = aesjs.utils.hex.toBytes(
+            encryptedHexInvoice
+          );
+          const decryptedBytesInvoice = aesCtr.decrypt(encryptedBytesInvoice);
+          const decryptedTextInvoice = aesjs.utils.utf8.fromBytes(
+            decryptedBytesInvoice
+          );
+          aesCtr = new aesjs.ModeOfOperation.ctr(aes_key, new aesjs.Counter());
+          const encryptedHexPassword = data.password;
+          const encryptedBytesPassword = aesjs.utils.hex.toBytes(
+            encryptedHexPassword
+          );
+          const decryptedBytesPassword = aesCtr.decrypt(encryptedBytesPassword);
+          const decryptedTextPassword = aesjs.utils.utf8.fromBytes(
+            decryptedBytesPassword
+          );
+          aesCtr = new aesjs.ModeOfOperation.ctr(aes_key, new aesjs.Counter());
+          const encryptedHexOthers = data.others;
+          const encryptedBytesOthers = aesjs.utils.hex.toBytes(
+            encryptedHexOthers
+          );
+          const decryptedBytesOthers = aesCtr.decrypt(encryptedBytesOthers);
+          const decryptedTextOthers = aesjs.utils.utf8.fromBytes(
+            decryptedBytesOthers
+          );
 
-                    return {
-                        id: data.id,
-                        name: data.name,
-                        company: data.company,
-                        invoice: decryptedTextInvoice,
-                        password: decryptedTextPassword,
-                        others: decryptedTextOthers
-                    }
-                })
-                console.log(resData);
-                res.send({data: resData});
-            } catch (err) {
-                console.error(err);
-            }
-            //res.send(resData);
+          return {
+            id: data.id,
+            name: data.name,
+            company: data.company,
+            invoice: decryptedTextInvoice,
+            password: decryptedTextPassword,
+            others: decryptedTextOthers
+          };
         });
-    } else {
-        res.send({ err: "Please login!" });
-    }
-})
+        console.log(resData);
+        res.send({ data: resData });
+      } catch (err) {
+        console.error(err);
+      }
+      //res.send(resData);
+    });
+  } else {
+    res.send({ err: "Please login!" });
+  }
+});
 
 app.get("*", function(request, response) {
   response.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
