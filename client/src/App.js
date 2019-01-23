@@ -216,7 +216,10 @@ class Customer extends Component {
         : "",
       others: this.props.selectedCustomer
         ? this.props.selectedCustomer.others
-        : ""
+        : "",
+      invoiceSaved: false,
+      passwordSaved: false,
+      othersSaved: false
     };
   }
 
@@ -242,8 +245,9 @@ class Customer extends Component {
   handleSave(field, value) {
     this.callSave(field, value)
       .then(res => {
-        //message.success("Successfully saved for" + field);
-        //console.log("Successfully saved for" + field);
+        this.setState({ [field + "Saved"]: true }, () => {
+          setTimeout(() => this.setState({ [field + "Saved"]: false }), 1800);
+        });
       })
       .catch(err => {
         console.log(err);
@@ -264,7 +268,7 @@ class Customer extends Component {
         content = { others: value, id: this.props.selectedCustomer.id };
         break;
       default:
-        console.log("Wrong");
+        console.log("Field name is wrong");
     }
     const response = await fetch("/save/" + field, {
       method: "POST",
@@ -296,6 +300,16 @@ class Customer extends Component {
                   value={this.state.invoice}
                   onChange={e => this.handleTextareaChange(e, "invoice")}
                 />
+                {this.state.invoiceSaved ? (
+                  <small>
+                    <Icon
+                      type="check-circle"
+                      theme="filled"
+                      style={{ color: "#52c41a" }}
+                    />{" "}
+                    Saved
+                  </small>
+                ) : null}
               </Panel>
               <Panel header="Password" key="2">
                 <textarea
@@ -303,6 +317,16 @@ class Customer extends Component {
                   value={this.state.password}
                   onChange={e => this.handleTextareaChange(e, "password")}
                 />
+                {this.state.passwordSaved ? (
+                  <small>
+                    <Icon
+                      type="check-circle"
+                      theme="filled"
+                      style={{ color: "#52c41a" }}
+                    />
+                    Saved
+                  </small>
+                ) : null}
               </Panel>
               <Panel header="Others" key="3">
                 <textarea
@@ -310,6 +334,16 @@ class Customer extends Component {
                   value={this.state.others}
                   onChange={e => this.handleTextareaChange(e, "others")}
                 />
+                {this.state.othersSaved ? (
+                  <small>
+                    <Icon
+                      type="check-circle"
+                      theme="filled"
+                      style={{ color: "#52c41a" }}
+                    />
+                    Saved
+                  </small>
+                ) : null}
               </Panel>
             </Collapse>
           </div>
