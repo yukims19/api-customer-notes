@@ -251,7 +251,7 @@ class Customer extends Component {
       })
       .catch(err => {
         console.log(err);
-        message.error("Something went wrong!!");
+        message.error("Something went wrong. You data is not saved!!");
       });
   }
 
