@@ -286,6 +286,29 @@ class Customer extends Component {
     this.handleSave(field, event.target.value);
   }
 
+  notePanel = panelName => {
+    let lowerCaseName = panelName.toLowerCase();
+    return (
+      <Panel header={panelName} key={panelName}>
+        <textarea
+          ref={textarea => (this[lowerCaseName] = textarea)}
+          value={this.state[lowerCaseName]}
+          onChange={e => this.handleTextareaChange(e, lowerCaseName)}
+        />
+        {this.state[lowerCaseName + "Saved"] ? (
+          <small>
+            <Icon
+              type="check-circle"
+              theme="filled"
+              style={{ color: "#52c41a" }}
+            />{" "}
+            Saved
+          </small>
+        ) : null}
+      </Panel>
+    );
+  };
+
   render() {
     return (
       <div className="customer-main">
@@ -293,58 +316,13 @@ class Customer extends Component {
           <div>
             {" "}
             <h1>{this.props.selectedCustomer.name}</h1>
-            <Collapse bordered={false} defaultActiveKey={["1", "2", "3"]}>
-              <Panel header="Invoice" key="1">
-                <textarea
-                  ref={textarea => (this.invoice = textarea)}
-                  value={this.state.invoice}
-                  onChange={e => this.handleTextareaChange(e, "invoice")}
-                />
-                {this.state.invoiceSaved ? (
-                  <small>
-                    <Icon
-                      type="check-circle"
-                      theme="filled"
-                      style={{ color: "#52c41a" }}
-                    />{" "}
-                    Saved
-                  </small>
-                ) : null}
-              </Panel>
-              <Panel header="Password" key="2">
-                <textarea
-                  ref={textarea => (this.password = textarea)}
-                  value={this.state.password}
-                  onChange={e => this.handleTextareaChange(e, "password")}
-                />
-                {this.state.passwordSaved ? (
-                  <small>
-                    <Icon
-                      type="check-circle"
-                      theme="filled"
-                      style={{ color: "#52c41a" }}
-                    />
-                    Saved
-                  </small>
-                ) : null}
-              </Panel>
-              <Panel header="Others" key="3">
-                <textarea
-                  ref={textarea => (this.others = textarea)}
-                  value={this.state.others}
-                  onChange={e => this.handleTextareaChange(e, "others")}
-                />
-                {this.state.othersSaved ? (
-                  <small>
-                    <Icon
-                      type="check-circle"
-                      theme="filled"
-                      style={{ color: "#52c41a" }}
-                    />
-                    Saved
-                  </small>
-                ) : null}
-              </Panel>
+            <Collapse
+              bordered={false}
+              defaultActiveKey={["Invoice", "Password", "Others"]}
+            >
+              {this.notePanel("Invoice")}
+              {this.notePanel("Password")}
+              {this.notePanel("Others")}
             </Collapse>
           </div>
         ) : (
