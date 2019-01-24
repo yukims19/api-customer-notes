@@ -216,7 +216,10 @@ class Customer extends Component {
         : "",
       others: this.props.selectedCustomer
         ? this.props.selectedCustomer.others
-        : ""
+        : "",
+      invoiceSaved: false,
+      passwordSaved: false,
+      othersSaved: false
     };
   }
 
@@ -242,12 +245,13 @@ class Customer extends Component {
   handleSave(field, value) {
     this.callSave(field, value)
       .then(res => {
-        //message.success("Successfully saved for" + field);
-        //console.log("Successfully saved for" + field);
+        this.setState({ [field + "Saved"]: true }, () => {
+          setTimeout(() => this.setState({ [field + "Saved"]: false }), 1800);
+        });
       })
       .catch(err => {
         console.log(err);
-        message.error("Something went wrong!!");
+        message.error("Something went wrong. You data is not saved!!");
       });
   }
 
@@ -264,7 +268,7 @@ class Customer extends Component {
         content = { others: value, id: this.props.selectedCustomer.id };
         break;
       default:
-        console.log("Wrong");
+        console.log("Field name is wrong");
     }
     const response = await fetch("/save/" + field, {
       method: "POST",
@@ -282,6 +286,29 @@ class Customer extends Component {
     this.handleSave(field, event.target.value);
   }
 
+  notePanel = panelName => {
+    let lowerCaseName = panelName.toLowerCase();
+    return (
+      <Panel header={panelName} key={panelName}>
+        <textarea
+          ref={textarea => (this[lowerCaseName] = textarea)}
+          value={this.state[lowerCaseName]}
+          onChange={e => this.handleTextareaChange(e, lowerCaseName)}
+        />
+        {this.state[lowerCaseName + "Saved"] ? (
+          <small>
+            <Icon
+              type="check-circle"
+              theme="filled"
+              style={{ color: "#52c41a" }}
+            />{" "}
+            Saved
+          </small>
+        ) : null}
+      </Panel>
+    );
+  };
+
   render() {
     return (
       <div className="customer-main">
@@ -289,28 +316,13 @@ class Customer extends Component {
           <div>
             {" "}
             <h1>{this.props.selectedCustomer.name}</h1>
-            <Collapse bordered={false} defaultActiveKey={["1", "2", "3"]}>
-              <Panel header="Invoice" key="1">
-                <textarea
-                  ref={textarea => (this.invoice = textarea)}
-                  value={this.state.invoice}
-                  onChange={e => this.handleTextareaChange(e, "invoice")}
-                />
-              </Panel>
-              <Panel header="Password" key="2">
-                <textarea
-                  ref={textarea => (this.password = textarea)}
-                  value={this.state.password}
-                  onChange={e => this.handleTextareaChange(e, "password")}
-                />
-              </Panel>
-              <Panel header="Others" key="3">
-                <textarea
-                  ref={textarea => (this.others = textarea)}
-                  value={this.state.others}
-                  onChange={e => this.handleTextareaChange(e, "others")}
-                />
-              </Panel>
+            <Collapse
+              bordered={false}
+              defaultActiveKey={["Invoice", "Password", "Others"]}
+            >
+              {this.notePanel("Invoice")}
+              {this.notePanel("Password")}
+              {this.notePanel("Others")}
             </Collapse>
           </div>
         ) : (
