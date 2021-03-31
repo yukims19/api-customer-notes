@@ -21,7 +21,7 @@ const FormItem = Form.Item;
 
 class NormalLoginForm extends React.Component {
   handleSubmit = (e) => {
-    this.props.setLogin(res.isLoggedin);
+    this.props.setLogin(true);
     e.preventDefault();
     /* this.props.form.validateFields((err, values) => {
      *   if (!err) {
