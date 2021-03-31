@@ -61,20 +61,21 @@ app.post("/login", (req, res) => {
     encryptedHexUsername,
     encryptedHexPassword
   );
-  pool.query(sql, (error, response) => {
-    console.log(error);
-    console.log(response);
-    if (error) {
-      req.session.isLoggedin = false;
-      throw new Error("Invalid Login!", error);
-    } else if (response.rows.length < 1) {
-      req.session.isLoggedin = false;
-      res.status(401).send({ message: "Invalid Login" });
-    } else {
-      req.session.isLoggedin = true;
-      res.send({ isLoggedin: req.session.isLoggedin });
-    }
-  });
+  res.send({ isLoggedin: true || req.session.isLoggedin });
+  /* pool.query(sql, (error, response) => {
+     *     console.log(error);
+     * console.log(response);
+     * if (error) {
+     *   req.session.isLoggedin = false;
+     *   throw new Error("Invalid Login!", error);
+     * } else if (response.rows.length < 1) {
+     *   req.session.isLoggedin = false;
+     *   res.status(401).send({ message: "Invalid Login" });
+     * } else {
+     *   req.session.isLoggedin = true;
+     *     res.send({ isLoggedin: req.session.isLoggedin });
+     * }
+       }); */
 });
 
 app.get("/customers", (req, res) => {
