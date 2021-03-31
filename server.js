@@ -10,7 +10,10 @@ const escape = require("pg-escape");
 const fetch = require("node-fetch");
 const connectionString = process.env.DATABASE_URL;
 const { Pool, Client } = require("pg");
-const client = new Client({ connectionString: connectionString });
+const client = new Client({
+  connectionString: connectionString,
+  ssl: { rejectUnauthorized: false },
+});
 client.connect();
 const pool = new Pool();
 const aesjs = require("aes-js");
