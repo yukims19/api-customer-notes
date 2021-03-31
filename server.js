@@ -37,30 +37,31 @@ app.get("/checkLogin", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const aesCtr = new aesjs.ModeOfOperation.ctr(aes_key, new aesjs.Counter());
+  /* const aesCtr = new aesjs.ModeOfOperation.ctr(aes_key, new aesjs.Counter());
 
-  const username = req.body.username;
-  const usernameBytes = aesjs.utils.utf8.toBytes(username);
-  const encryptedBytesUsername = aesCtr.encrypt(usernameBytes);
-  const encryptedHexUsername = aesjs.utils.hex.fromBytes(
-    encryptedBytesUsername
-  );
+     * const username = req.body.username;
+     * const usernameBytes = aesjs.utils.utf8.toBytes(username);
+     * const encryptedBytesUsername = aesCtr.encrypt(usernameBytes);
+     * const encryptedHexUsername = aesjs.utils.hex.fromBytes(
+     *   encryptedBytesUsername
+     * );
 
-  const password = req.body.password;
-  const passwordBytes = aesjs.utils.utf8.toBytes(password);
-  const encryptedBytesPassword = aesCtr.encrypt(passwordBytes);
-  const encryptedHexPassword = aesjs.utils.hex.fromBytes(
-    encryptedBytesPassword
-  );
+     * const password = req.body.password;
+     * const passwordBytes = aesjs.utils.utf8.toBytes(password);
+     * const encryptedBytesPassword = aesCtr.encrypt(passwordBytes);
+     * const encryptedHexPassword = aesjs.utils.hex.fromBytes(
+     *   encryptedBytesPassword
+     * );
 
-  console.log(username, password);
-  console.log(encryptedHexUsername, encryptedHexPassword);
-  //  Insert into users(username,password) Values(encryptedHexUsername, encryptedHexPassword)
-  const sql = escape(
-    "select *  FROM users WHERE username = %L AND password = %L",
-    encryptedHexUsername,
-    encryptedHexPassword
-  );
+     * console.log(username, password);
+     * console.log(encryptedHexUsername, encryptedHexPassword);
+     * //  Insert into users(username,password) Values(encryptedHexUsername, encryptedHexPassword)
+     * const sql = escape(
+     *   "select *  FROM users WHERE username = %L AND password = %L",
+     *   encryptedHexUsername,
+     *   encryptedHexPassword
+     * ); */
+  req.session.isLoggedin = true;
   res.send({ isLoggedin: true || req.session.isLoggedin });
   /* pool.query(sql, (error, response) => {
      *     console.log(error);
@@ -72,8 +73,8 @@ app.post("/login", (req, res) => {
      *   req.session.isLoggedin = false;
      *   res.status(401).send({ message: "Invalid Login" });
      * } else {
-     *   req.session.isLoggedin = true;
-     *     res.send({ isLoggedin: req.session.isLoggedin });
+         *   req.session.isLoggedin = true;
+         *     res.send({ isLoggedin: req.session.isLoggedin });
      * }
        }); */
 });

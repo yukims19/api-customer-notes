@@ -26,6 +26,7 @@ class NormalLoginForm extends React.Component {
       if (!err) {
         this.callLogin(values)
           .then((res) => {
+            console.log("here res:", res);
             this.props.setLogin(res.isLoggedin);
           })
           .catch((err) => {
