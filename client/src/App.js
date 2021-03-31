@@ -21,21 +21,20 @@ const FormItem = Form.Item;
 
 class NormalLoginForm extends React.Component {
   handleSubmit = (e) => {
-    this.props.setLogin(true);
     e.preventDefault();
-    /* this.props.form.validateFields((err, values) => {
-     *   if (!err) {
-     *     this.callLogin(values)
-     *       .then((res) => {
-     *         console.log("here res:", res);
-     *         this.props.setLogin(res.isLoggedin);
-     *       })
-     *       .catch((err) => {
-     *         console.log(err);
-     *         message.error("Invalid Login! Try again");
-     *       });
-     *   }
-     * }); */
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        this.callLogin(values)
+          .then((res) => {
+            console.log("here res:", res);
+            this.props.setLogin(res.isLoggedin);
+          })
+          .catch((err) => {
+            console.log("error:", err);
+            message.error("Invalid Login! Try again");
+          });
+      }
+    });
   };
 
   callLogin = async (values) => {
