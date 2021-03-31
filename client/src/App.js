@@ -9,7 +9,7 @@ import {
   Icon,
   Alert,
   message,
-  Popconfirm
+  Popconfirm,
 } from "antd";
 
 import { Parser } from "json2csv";
@@ -20,15 +20,15 @@ const Panel = Collapse.Panel;
 const FormItem = Form.Item;
 
 class NormalLoginForm extends React.Component {
-  handleSubmit = e => {
+  handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
         this.callLogin(values)
-          .then(res => {
+          .then((res) => {
             this.props.setLogin(res.isLoggedin);
           })
-          .catch(err => {
+          .catch((err) => {
             console.log(err);
             message.error("Invalid Login! Try again");
           });
@@ -36,16 +36,17 @@ class NormalLoginForm extends React.Component {
     });
   };
 
-  callLogin = async values => {
+  callLogin = async (values) => {
     const response = await fetch("/login", {
       method: "POST",
       body: JSON.stringify({
         username: values.username,
-        password: values.password
+        password: values.password,
       }),
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
 
+    console.log("login response:", response);
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
     return body;
@@ -57,7 +58,7 @@ class NormalLoginForm extends React.Component {
       <Form onSubmit={this.handleSubmit} className="login-form">
         <FormItem>
           {getFieldDecorator("username", {
-            rules: [{ required: true, message: "Please input your username!" }]
+            rules: [{ required: true, message: "Please input your username!" }],
           })(
             <Input
               prefix={<Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />}
@@ -67,7 +68,7 @@ class NormalLoginForm extends React.Component {
         </FormItem>
         <FormItem>
           {getFieldDecorator("password", {
-            rules: [{ required: true, message: "Please input your Password!" }]
+            rules: [{ required: true, message: "Please input your Password!" }],
           })(
             <Input
               prefix={<Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />}
@@ -93,33 +94,33 @@ class NormalLoginForm extends React.Component {
 const LoginForm = Form.create()(NormalLoginForm);
 
 class AddForm extends React.Component {
-  handleSubmit = e => {
+  handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
         this.callAdd(values)
-          .then(res => {
+          .then((res) => {
             this.props.getAllCustomers();
             message.success("Successfully added new customer: " + values.name);
           })
-          .catch(error => {
+          .catch((error) => {
             console.log(error);
             message.error("Something went wrong!");
           });
         this.props.form.setFieldsValue({
           name: "",
-          company: ""
+          company: "",
         });
       }
     });
   };
 
-  callAdd = async values => {
+  callAdd = async (values) => {
     const response = await fetch("/add", {
       method: "POST",
       body: JSON.stringify(values),
-      headers: { "Content-Type": "application/json" }
-    }).then(res => res);
+      headers: { "Content-Type": "application/json" },
+    }).then((res) => res);
 
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
@@ -133,7 +134,7 @@ class AddForm extends React.Component {
         <Form onSubmit={this.handleSubmit} className="login-form">
           <FormItem>
             {getFieldDecorator("name", {
-              rules: [{ required: true, message: "Please input Name!" }]
+              rules: [{ required: true, message: "Please input Name!" }],
             })(
               <Input
                 prefix={
@@ -145,7 +146,7 @@ class AddForm extends React.Component {
           </FormItem>
           <FormItem>
             {getFieldDecorator("company", {
-              rules: [{ required: true, message: "Please input Company!" }]
+              rules: [{ required: true, message: "Please input Company!" }],
             })(
               <Input
                 prefix={
@@ -219,7 +220,7 @@ class Customer extends Component {
         : "",
       invoiceSaved: false,
       passwordSaved: false,
-      othersSaved: false
+      othersSaved: false,
     };
   }
 
@@ -229,27 +230,27 @@ class Customer extends Component {
       JSON.stringify(prevProps.selectedCustomer)
     ) {
       this.setState({
-        invoice: idx(this.props, _ => _.selectedCustomer.invoice)
+        invoice: idx(this.props, (_) => _.selectedCustomer.invoice)
           ? this.props.selectedCustomer.invoice
           : "",
-        password: idx(this.props, _ => _.selectedCustomer.password)
+        password: idx(this.props, (_) => _.selectedCustomer.password)
           ? this.props.selectedCustomer.password
           : "",
-        others: idx(this.props, _ => _.selectedCustomer.others)
+        others: idx(this.props, (_) => _.selectedCustomer.others)
           ? this.props.selectedCustomer.others
-          : ""
+          : "",
       });
     }
   }
 
   handleSave(field, value) {
     this.callSave(field, value)
-      .then(res => {
+      .then((res) => {
         this.setState({ [field + "Saved"]: true }, () => {
           setTimeout(() => this.setState({ [field + "Saved"]: false }), 1800);
         });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
         message.error("Something went wrong. You data is not saved!!");
       });
@@ -273,8 +274,8 @@ class Customer extends Component {
     const response = await fetch("/save/" + field, {
       method: "POST",
       body: JSON.stringify(content),
-      headers: { "Content-Type": "application/json" }
-    }).then(res => res);
+      headers: { "Content-Type": "application/json" },
+    }).then((res) => res);
 
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
@@ -286,14 +287,14 @@ class Customer extends Component {
     this.handleSave(field, event.target.value);
   }
 
-  notePanel = panelName => {
+  notePanel = (panelName) => {
     let lowerCaseName = panelName.toLowerCase();
     return (
       <Panel header={panelName} key={panelName}>
         <textarea
-          ref={textarea => (this[lowerCaseName] = textarea)}
+          ref={(textarea) => (this[lowerCaseName] = textarea)}
           value={this.state[lowerCaseName]}
-          onChange={e => this.handleTextareaChange(e, lowerCaseName)}
+          onChange={(e) => this.handleTextareaChange(e, lowerCaseName)}
         />
         {this.state[lowerCaseName + "Saved"] ? (
           <small>
@@ -342,12 +343,12 @@ class AllCustomers extends Component {
   }
   handleDelete(customerId) {
     this.callDelete(customerId)
-      .then(res => {
+      .then((res) => {
         message.success("Successfully Deleted");
         //this.props.setSelectedCustomer();
         this.props.getAllCustomers();
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
         message.error("Something went wrong!!");
       })
@@ -357,12 +358,12 @@ class AllCustomers extends Component {
         }
       });
   }
-  callDelete = async customerId => {
+  callDelete = async (customerId) => {
     const response = await fetch("/delete", {
       method: "POST",
       body: JSON.stringify({ customerId: customerId }),
-      headers: { "Content-Type": "application/json" }
-    }).then(res => res);
+      headers: { "Content-Type": "application/json" },
+    }).then((res) => res);
 
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
@@ -373,7 +374,7 @@ class AllCustomers extends Component {
     return (
       <div className="left-body">
         {this.props.customersAll
-          ? this.props.customersAll.map(customer => {
+          ? this.props.customersAll.map((customer) => {
               if (
                 this.props.filter == null ||
                 customer.name
@@ -388,7 +389,7 @@ class AllCustomers extends Component {
                     <div className="alluser-userinfo">
                       <p
                         className="alluser-name"
-                        onClick={e =>
+                        onClick={(e) =>
                           this.props.handleCustomerSelection(e, customer)
                         }
                       >
@@ -422,15 +423,15 @@ class App extends Component {
       filter: null,
       selectedCustomer: null,
       customersAll: [],
-      isLoggedin: null
+      isLoggedin: null,
     };
   }
   componentDidMount() {
     this.callCheckLogin()
-      .then(res => {
+      .then((res) => {
         this.setState({ isLoggedin: res.isLoggedin });
       })
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
   }
 
   callCheckLogin = async () => {
@@ -442,12 +443,12 @@ class App extends Component {
 
   getAllCustomers() {
     this.callCustomers()
-      .then(res =>
+      .then((res) =>
         this.setState({
-          customersAll: res
+          customersAll: res,
         })
       )
-      .catch(err => console.log(err));
+      .catch((err) => console.log(err));
   }
   callCustomers = async () => {
     const response = await fetch("/customers");
@@ -462,24 +463,24 @@ class App extends Component {
 
   setSelectedCustomer() {
     this.setState({
-      selectedCustomer: null
+      selectedCustomer: null,
     });
   }
   handleCustomerSelection(e, customer) {
     const card = e.target.parentNode.parentNode;
     const allCards = card.parentNode.childNodes;
-    allCards.forEach(e => e.classList.remove("active"));
+    allCards.forEach((e) => e.classList.remove("active"));
     card.classList.add("active");
     this.callSelectedCustomers(customer.id)
-      .then(res => {
+      .then((res) => {
         this.setState({
-          selectedCustomer: res[0]
+          selectedCustomer: res[0],
         });
       })
-      .catch(err => console.log(err));
+      .catch((err) => console.log(err));
   }
 
-  callSelectedCustomers = async id => {
+  callSelectedCustomers = async (id) => {
     const response = await fetch("/customers/" + id);
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
@@ -490,10 +491,10 @@ class App extends Component {
     this.setState({ isLoggedin: isLoggedin });
   }
 
-  downloadButtonOnClick = e => {
+  downloadButtonOnClick = (e) => {
     e.preventDefault();
     this.callDownload()
-      .then(res => {
+      .then((res) => {
         const parser = new Parser(opts);
         const csv = parser.parse(res.data);
         const hiddenElement = document.createElement("a");
@@ -502,7 +503,7 @@ class App extends Component {
         hiddenElement.download = "note-data.csv";
         hiddenElement.click();
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
         message.error("Failed to download");
       });
@@ -524,7 +525,7 @@ class App extends Component {
               <div className="download">
                 <button
                   className="btn btn-secondary"
-                  onClick={e => this.downloadButtonOnClick(e)}
+                  onClick={(e) => this.downloadButtonOnClick(e)}
                 >
                   {" "}
                   Download Backup Data{" "}
