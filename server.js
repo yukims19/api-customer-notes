@@ -26,7 +26,7 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: { path: "/", httpOnly: true, secure: false, maxAge: null },
-    isLoggedin: false
+    isLoggedin: false,
   })
 );
 
@@ -65,7 +65,7 @@ app.post("/login", (req, res) => {
     console.log(response);
     if (error) {
       req.session.isLoggedin = false;
-      throw new Error("Invalid Login!");
+      throw new Error("Invalid Login!", error);
     } else if (response.rows.length < 1) {
       req.session.isLoggedin = false;
       res.status(401).send({ message: "Invalid Login" });
@@ -134,8 +134,8 @@ app.get("/customers/:id", (req, res) => {
             company: data.company,
             invoice: decryptedTextInvoice,
             password: decryptedTextPassword,
-            others: decryptedTextOthers
-          }
+            others: decryptedTextOthers,
+          },
         ];
       } else {
         resData = [
@@ -145,8 +145,8 @@ app.get("/customers/:id", (req, res) => {
             company: null,
             invoice: null,
             password: null,
-            others: null
-          }
+            others: null,
+          },
         ];
       }
       res.send(resData);
@@ -229,7 +229,7 @@ app.get("/download", (req, res) => {
     client.query(sql, (error, response) => {
       try {
         let resDataRaw = response.rows;
-        let resData = resDataRaw.map(data => {
+        let resData = resDataRaw.map((data) => {
           let aesCtr = new aesjs.ModeOfOperation.ctr(
             aes_key,
             new aesjs.Counter()
@@ -267,7 +267,7 @@ app.get("/download", (req, res) => {
             company: data.company,
             invoice: decryptedTextInvoice,
             password: decryptedTextPassword,
-            others: decryptedTextOthers
+            others: decryptedTextOthers,
           };
         });
         console.log(resData);
@@ -282,7 +282,7 @@ app.get("/download", (req, res) => {
   }
 });
 
-app.get("*", function(request, response) {
+app.get("*", function (request, response) {
   response.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
 });
 
