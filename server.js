@@ -9,9 +9,10 @@ const port = process.env.PORT || 5000;
 const escape = require("pg-escape");
 const fetch = require("node-fetch");
 const connectionString = process.env.DATABASE_URL;
-const { Client } = require("pg");
+const { Pool, Client } = require("pg");
 const client = new Client({ connectionString: connectionString });
 client.connect();
+const pool = new Pool();
 const aesjs = require("aes-js");
 const aes_key = process.env.AES_KEY.split(", ").map(Number);
 const session = require("express-session");
@@ -60,7 +61,7 @@ app.post("/login", (req, res) => {
     encryptedHexUsername,
     encryptedHexPassword
   );
-  client.query(sql, (error, response) => {
+  pool.query(sql, (error, response) => {
     console.log(error);
     console.log(response);
     if (error) {
@@ -80,7 +81,7 @@ app.get("/customers", (req, res) => {
   if (req.session.isLoggedin) {
     var sql = "SELECT * FROM customers";
     let resData;
-    client.query(sql, (error, response) => {
+    pool.query(sql, (error, response) => {
       resData = response.rows;
       res.send(resData);
     });
@@ -93,7 +94,7 @@ app.get("/customers/:id", (req, res) => {
   if (req.session.isLoggedin) {
     const sql = escape("SELECT * FROM customers WHERE id=%L", req.params.id);
     let resData;
-    client.query(sql, (error, response) => {
+    pool.query(sql, (error, response) => {
       const data = response.rows[0];
       if (data) {
         let aesCtr = new aesjs.ModeOfOperation.ctr(
@@ -173,7 +174,7 @@ app.post("/save/:field", (req, res) => {
       encryptedHexFieldValue,
       customerId.toString()
     );
-    client.query(sql, (error, response) => {
+    pool.query(sql, (error, response) => {
       console.log(error);
       res.send({ respoonse: "success!!" });
     });
@@ -191,7 +192,7 @@ app.post("/add", (req, res) => {
       name,
       company
     );
-    client.query(sql, (error, response) => {
+    pool.query(sql, (error, response) => {
       console.log(error);
       if (error) {
         throw new Error("DB error!");
@@ -210,7 +211,7 @@ app.post("/delete", (req, res) => {
       "DELETE FROM customers WHERE id = %L",
       customerId.toString()
     );
-    client.query(sql, (error, response) => {
+    pool.query(sql, (error, response) => {
       console.log(error);
       if (error) {
         throw new Error("DB error!");
@@ -226,7 +227,7 @@ app.get("/download", (req, res) => {
   if (req.session.isLoggedin) {
     var sql = "SELECT * FROM customers";
 
-    client.query(sql, (error, response) => {
+    pool.query(sql, (error, response) => {
       try {
         let resDataRaw = response.rows;
         let resData = resDataRaw.map((data) => {
